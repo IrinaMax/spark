@@ -544,6 +544,10 @@ setGeneric("sumDistinct", function(x) { standardGeneric("sumDistinct") })
 #' @export
 setGeneric("upper", function(x) { standardGeneric("upper") })
 
+
+###################### Streaming Methods ##########################
+
+
 # The jdstream accessor function.
 setGeneric("getJDStream", function(dstream, ...) { standardGeneric("getJDStream") })
 
