@@ -87,13 +87,6 @@ private[r] class RBackendHandler(server: RBackend)
             writeInt(dos, 0)
             writeType(dos, "void")
           }
-        case "sendsomething" =>
-          val sos = RBackend.callbackSocket.getOutputStream()
-          val dos2 = new DataOutputStream(sos)
-          writeString(dos2, "test")
-          dos2.flush()
-          writeInt(dos, 0)
-          writeType(dos, "void")
         case _ => dos.writeInt(-1)
       }
     } else {
