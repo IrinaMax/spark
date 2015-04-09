@@ -17,6 +17,9 @@
 
 ############ RDD Actions and Transformations ############
 
+# Return the serialization mode.
+setGeneric("getSerializedMode", function(x, ...) { standardGeneric("getSerializedMode") })
+
 #' @rdname aggregateRDD
 #' @seealso reduce
 #' @export
@@ -33,7 +36,7 @@ setGeneric("coalesce", function(x, numPartitions, ...) { standardGeneric("coales
 
 #' @rdname checkpoint-methods
 #' @export
-setGeneric("checkpoint", function(x) { standardGeneric("checkpoint") })
+setGeneric("checkpoint", function(x, ...) { standardGeneric("checkpoint") })
 
 #' @rdname collect-methods
 #' @export
@@ -173,7 +176,7 @@ setGeneric("saveAsObjectFile", function(x, path) { standardGeneric("saveAsObject
 
 #' @rdname saveAsTextFile
 #' @export
-setGeneric("saveAsTextFile", function(x, path) { standardGeneric("saveAsTextFile") })
+setGeneric("saveAsTextFile", function(x, ...) { standardGeneric("saveAsTextFile") })
 
 #' @rdname setName
 #' @export
@@ -541,3 +544,61 @@ setGeneric("sumDistinct", function(x) { standardGeneric("sumDistinct") })
 #' @export
 setGeneric("upper", function(x) { standardGeneric("upper") })
 
+# The jdstream accessor function.
+setGeneric("getJDStream", function(dstream, ...) { standardGeneric("getJDStream") })
+
+#' @rdname transformWith
+#' @export
+setGeneric("transformWith", function(x, func, other) { standardGeneric("transformWith") })
+
+#' @rdname slice
+#' @export
+setGeneric("slice", function(x, begin, end) { standardGeneric("slice") })
+
+#' @rdname windowDStream
+#' @export
+setGeneric("windowDStream", 
+           function(x, windowDuration, slideDuration) { standardGeneric("windowDStream") })
+
+#' @rdname window-method
+#' @export
+setGeneric("reduceByWindow", 
+           function(x, reduceFunc, invReduceFunc, windowDuration, slideDuration = NULL) { 
+             standardGeneric("reduceByWindow") 
+           })
+
+#' @rdname window-method
+#' @export
+setGeneric("countByWindow", 
+           function(x, windowDuration, slideDuration = NULL) { 
+             standardGeneric("countByWindow") 
+           })
+
+#' @rdname window-method
+#' @export
+setGeneric("countByValueAndWindow", 
+           function(x, windowDuration, slideDuration = NULL, numPartitions = 1L) { 
+             standardGeneric("countByValueAndWindow") 
+           })
+
+#' @rdname window-method
+#' @export
+setGeneric("groupByKeyAndWindow", 
+           function(x, windowDuration, slideDuration = NULL, numPartitions = 1L) { 
+             standardGeneric("groupByKeyAndWindow") 
+           })
+
+#' @rdname window-method
+#' @export
+setGeneric("reduceByKeyAndWindow", 
+           function(x, reduceFunc, invReduceFunc, windowDuration, slideDuration = NULL, 
+                    numPartitions = 1L, filterFunc = NULL) { 
+             standardGeneric("reduceByKeyAndWindow") 
+           })
+
+#' @rdname updateStateByKey
+#' @export
+setGeneric("updateStateByKey", 
+           function(x, updateFunc, numPartitions = 1L) { 
+             standardGeneric("updateStateByKey") 
+           })

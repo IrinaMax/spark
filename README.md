@@ -1,4 +1,6 @@
-# Apache Spark
+# Apache Spark (With R Frontend on Spark Streaming)
+
+This forked repository provides an R package to do Spark Streaming in R. Please follow the "Running SparkR Streaming" in SparkR documention (README.md in R/ directory).
 
 Spark is a fast and general cluster computing system for Big Data. It provides
 high-level APIs in Scala, Java, and Python, and an optimized engine that

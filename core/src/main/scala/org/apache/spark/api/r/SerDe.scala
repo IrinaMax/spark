@@ -66,7 +66,7 @@ private[spark] object SerDe {
       case 'D' => readDate(dis)
       case 't' => readTime(dis)
       case 'j' => JVMObjectTracker.getObject(readString(dis))
-      case _ => throw new IllegalArgumentException(s"Invalid type $dataType")
+      case _ => throw new IllegalArgumentException(s"Invalid type $dataType.")
     }
   }
 

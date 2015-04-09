@@ -18,7 +18,7 @@
 package org.apache.spark.api.r
 
 import java.io.{DataOutputStream, File, FileOutputStream, IOException}
-import java.net.{InetSocketAddress, ServerSocket}
+import java.net.{InetSocketAddress, ServerSocket, Socket}
 import java.util.concurrent.TimeUnit
 
 import io.netty.bootstrap.ServerBootstrap
@@ -87,11 +87,26 @@ private[spark] class RBackend {
       bootstrap.childGroup().shutdownGracefully()
     }
     bootstrap = null
+
+    // Send close to R callback server.
+    if (RBackend.callbackSocket != null && 
+        !RBackend.callbackSocket.isClosed()) {
+      try {
+        println("Requesting to close a call back server.")
+        val dos = new DataOutputStream(RBackend.callbackSocket.getOutputStream())
+        SerDe.writeString(dos, "close")
+        RBackend.callbackSocket.close()
+      }
+    }
   }
 
 }
 
 private[spark] object RBackend extends Logging {
+  
+  // Channel to callback server.
+  private[spark] var callbackSocket: Socket = null
+    
   def main(args: Array[String]): Unit = {
     if (args.length < 1) {
       System.err.println("Usage: RBackend <tempFilePath>")

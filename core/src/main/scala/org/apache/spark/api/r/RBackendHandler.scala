@@ -18,6 +18,7 @@
 package org.apache.spark.api.r
 
 import java.io.{ByteArrayInputStream, ByteArrayOutputStream, DataInputStream, DataOutputStream}
+import java.net.Socket
 
 import scala.collection.mutable.HashMap
 
@@ -68,6 +69,31 @@ private[r] class RBackendHandler(server: RBackend)
               logError(s"Removing $objId failed", e)
               writeInt(dos, -1)
           }
+        case "connectCallback" =>
+          println("Connecting to a callback server.")
+         RBackend.callbackSocket = new Socket("localhost", 54321)
+          writeInt(dos, 0)
+          writeType(dos, "void")
+        case "closeCallback" =>
+          // Send close to R callback server.
+          if (RBackend.callbackSocket != null &&
+              RBackend.callbackSocket.isConnected()) {
+            try {
+              println("Requesting to close a call back server.")
+              val os = new DataOutputStream(RBackend.callbackSocket.getOutputStream())
+              writeString(os, "close")
+              RBackend.callbackSocket.close()
+            }
+            writeInt(dos, 0)
+            writeType(dos, "void")
+          }
+        case "sendsomething" =>
+          val sos = RBackend.callbackSocket.getOutputStream()
+          val dos2 = new DataOutputStream(sos)
+          writeString(dos2, "test")
+          dos2.flush()
+          writeInt(dos, 0)
+          writeType(dos, "void")
         case _ => dos.writeInt(-1)
       }
     } else {
@@ -176,10 +202,11 @@ private[r] class RBackendHandler(server: RBackend)
           case java.lang.Integer.TYPE => classOf[java.lang.Integer]
           case java.lang.Double.TYPE => classOf[java.lang.Double]
           case java.lang.Boolean.TYPE => classOf[java.lang.Boolean]
+          case java.lang.Long.TYPE => classOf[java.lang.Integer]
           case _ => parameterType
         }
       }
-      if (!parameterWrapperType.isInstance(args(i))) {
+      if (args(i) != null && !parameterWrapperType.isInstance(args(i))) {
         return false
       }
     }

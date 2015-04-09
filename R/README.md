@@ -36,6 +36,22 @@ Sys.setenv(SPARK_HOME="/Users/shivaram/spark")
 library(SparkR)
 sc <- sparkR.init(master="local")
 ```
+#### Running SparkR Streaming
+
+After starting the SparkR with `sparkR` script or RStudio or any other your favourite R frontends, you can initialize SparkR streaming with the Spark Context `sc` and the command
+```
+ssc <-sparkR.streaming.init(sc, batchDuration = 1L)
+```
+
+to start a Streaming Context `ssc`. Then you can create DStreams and apply transformations. You can start streaming by using command
+```
+startStreaming(ssc)
+```
+
+For window and state functions, you need to give SparkR streaming a checkpoint directory before starting streaming, by using command
+```
+checkpoint(ssc, "/Users/haolin/checkpoints")
+```
 
 #### Making changes to SparkR
 
@@ -53,6 +69,10 @@ SparkR comes with several sample programs in the `examples/src/main/r` directory
 To run one of them, use `./bin/sparkR <filename> <args>`. For example:
 
     ./bin/sparkR examples/src/main/r/pi.R local[2]
+
+To run SparkR Streaming wordcount example:
+
+    ./bin/sparkR examples/src/main/r/streaming/hdfs_wordcount.R /home/haolin/rstreaming/
 
 You can also run the unit-tests for SparkR by running (you need to install the [testthat](http://cran.r-project.org/web/packages/testthat/index.html) package first):
 

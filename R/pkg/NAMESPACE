@@ -180,3 +180,32 @@ export("cacheTable",
 
 export("print.structType",
        "print.structField")
+
+# R streaming.
+exportClasses("DStream")
+
+exportMethods(
+              "countByValueAndWindow",
+              "countByWindow",
+              "foreachRDD",
+              "groupByKeyAndWindow",
+              "print",
+              "reduceByKeyAndWindow",
+              "reduceByWindow",
+              "slice",
+              "transformWith",
+              "updateStateByKey",
+              "windowDStream"
+             )
+
+export(
+       "textFileStream",
+       "queueStream",
+       "socketTextStream",
+       "startStreaming",
+       "awaitTermination",
+       "transform"
+      )
+
+export("sparkR.streaming.init")
+export("sparkR.streaming.stop")
