@@ -34,7 +34,7 @@ cat("Callback server connected to backend.\n")
 
 # Setup the connection with JVM Backend.
 backend.port <- as.integer(Sys.getenv("BACKEND_PORT"))
-assign("sparkRBackendPort", backend.port, envir = SparkR:::.sparkREnv)
+assign("backendPort", backend.port, envir = SparkR:::.sparkREnv)
 cat("Connecting backend with port number: ", backend.port, "\n")
 assign(".sparkRCon", 
        socketConnection(port = backend.port, blocking = TRUE, open = "wb"), 

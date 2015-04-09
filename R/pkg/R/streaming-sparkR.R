@@ -15,6 +15,13 @@
 # limitations under the License.
 #
 
+#' Initialize a new Spark Streaming Context.
+#'
+#' This function initializes a new StreamingContext.
+#'
+#' @param sc The Spark Context.
+#' @param batchDuration Time interval in sec after which the DStream generates a RDD.
+#' @export
 sparkR.streaming.init <- function(sc, batchDuration) {
   if (exists(".sparkRjssc", envir = .sparkREnv)) {
     cat("Re-using existing Spark Streaming Context.",
