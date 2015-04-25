@@ -279,7 +279,7 @@ test_that("windowDStream on DStreams", {
 })
 
 test_that("countByWindow on DStreams", {
-  .setup(to = 40)
+  .setup(to = 50)
   checkpoint(ssc, "checkpoints")
   inputStream <- queueStream(ssc, list(1:2, 1:3, 1:4, 1:5, 1:4))
   countWindowStream <- countByWindow(inputStream, 5L, 1L)
@@ -292,7 +292,7 @@ test_that("countByWindow on DStreams", {
 })
 
 test_that("countByValueAndWindow on DStreams", {
-  .setup(15)
+  .setup(20)
   checkpoint(ssc, "checkpoints")
   inputStream <- queueStream(ssc, list(1:2, 1:3, 1:4, 1:5, 1:4))
   countWindowStream <- countByValueAndWindow(inputStream, 5L, 1L)
