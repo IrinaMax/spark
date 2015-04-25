@@ -50,7 +50,7 @@ startStreaming(ssc)
 
 For window and state functions, you need to give SparkR streaming a checkpoint directory before starting streaming, by using command
 ```
-checkpoint(ssc, "/Users/haolin/checkpoints")
+checkpoint(ssc, "/Users/haolin/checkpoint")
 ```
 
 #### Making changes to SparkR

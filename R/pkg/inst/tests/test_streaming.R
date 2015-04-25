@@ -280,7 +280,7 @@ test_that("windowDStream on DStreams", {
 
 test_that("countByWindow on DStreams", {
   .setup(to = 50)
-  checkpoint(ssc, "checkpoints")
+  checkpoint(ssc, "/tmp/checkpoint")
   inputStream <- queueStream(ssc, list(1:2, 1:3, 1:4, 1:5, 1:4))
   countWindowStream <- countByWindow(inputStream, 5L, 1L)
   expected <- list(list(2), list(5), list(9), list(14), list(18), list(16), 
@@ -288,24 +288,24 @@ test_that("countByWindow on DStreams", {
   actual <- .collectStream(countWindowStream, 7)
   expect_equal(actual, expected)
   .finish()
-  unlink("checkpoints")
+  unlink("/tmp/checkpoint")
 })
 
 test_that("countByValueAndWindow on DStreams", {
   .setup(20)
-  checkpoint(ssc, "checkpoints")
+  checkpoint(ssc, "/tmp/checkpoint")
   inputStream <- queueStream(ssc, list(1:2, 1:3, 1:4, 1:5, 1:4))
   countWindowStream <- countByValueAndWindow(inputStream, 5L, 1L)
   expected <- list(list(2), list(3), list(4), list(5), list(5), list(5))
   actual <- .collectStream(countWindowStream, 6)
   expect_equal(actual, expected)
   .finish()
-  unlink("checkpoints")
+  unlink("/tmp/checkpoint")
 })
 
 test_that("groupByKeyAndWindow on DStreams", {
   .setup(15)
-  checkpoint(ssc, "checkpoints")
+  checkpoint(ssc, "/tmp/checkpoint")
   inputStream <- queueStream(ssc, list(
     list(list(1L, 1)), list(list(1L, 2)), list(list(1L, 3)), list(list(1L, 4))))
   groupWindowStream <- groupByKeyAndWindow(inputStream, 3L, 1L)
@@ -315,12 +315,12 @@ test_that("groupByKeyAndWindow on DStreams", {
   actual <- .collectStream(groupWindowStream, 6)
   expect_equal(actual, expected)
   .finish()
-  unlink("checkpoints")
+  unlink("/tmp/checkpoint")
 })
 
 test_that("updateStateByKey on DStreams", {
   .setup()
-  checkpoint(ssc, "checkpoints")
+  checkpoint(ssc, "/tmp/checkpoint")
   inputStream <- queueStream(ssc, list(
     list(list(1L, 1)), list(list(1L, 2)), list(list(1L, 3)), list(list(1L, 4))))
   updateFunc <- function(vs, s) { sum(unlist(vs), s) }
@@ -329,5 +329,5 @@ test_that("updateStateByKey on DStreams", {
   actual <- .collectStream(statefulSumStream, 4)
   expect_equal(actual, expected)
   .finish()
-  unlink("checkpoints")
+  unlink("/tmp/checkpoint")
 })
