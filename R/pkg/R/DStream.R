@@ -566,7 +566,7 @@ setMethod("unionRDD",
             if (getSlideDurationMillisec(x) != getSlideDurationMillisec(y)) {
               stop("Two DStreams should have same slide durations.")
             }
-            transformWith(x, function(rdd1, rdd2) { unionRDD(rdd1, rdd2) }, y)
+            transformWith(x, function(rdd1, rdd2) { SparkR:::unionRDD(rdd1, rdd2) }, y)
           })
 
 #' Applies 'cogroup' to RDDs in several DStreams.
@@ -590,7 +590,7 @@ setMethod("cogroup",
           "DStream",
           function(x, y, numPartitions) {
             transformWith(x, function(rdd1, rdd2) { 
-              cogroup(rdd1, rdd2, numPartitions = numPartitions) 
+              SparkR:::cogroup(rdd1, rdd2, numPartitions = numPartitions) 
             }, y)
           })
 
@@ -614,7 +614,7 @@ setMethod("join",
           signature(x = "DStream", y = "DStream"),
           function(x, y, numPartitions) {
             transformWith(x, function(rdd1, rdd2) { 
-              join(rdd1, rdd2, numPartitions = numPartitions)
+              SparkR:::join(rdd1, rdd2, numPartitions = numPartitions)
             }, y)
           })
 
@@ -642,7 +642,7 @@ setMethod("leftOuterJoin",
           signature(x = "DStream", y = "DStream", numPartitions = "integer"),
           function(x, y, numPartitions) {
             transformWith(x, function(rdd1, rdd2) { 
-              leftOuterJoin(rdd1, rdd2, numPartitions = numPartitions)
+              SparkR:::leftOuterJoin(rdd1, rdd2, numPartitions = numPartitions)
             }, y)
           })
 
@@ -863,10 +863,10 @@ setMethod("reduceByWindow",
           signature(x = "DStream"),
           function(x, reduceFunc, invReduceFunc = NULL, 
                    windowDuration, slideDuration = NULL) {
-            keyed <- map(x, function(e) { list(1, e) })
+            keyed <- SparkR:::map(x, function(e) { list(1, e) })
             reduced <- reduceByKeyAndWindow(keyed, reduceFunc, invReduceFunc,
                                             windowDuration, slideDuration, 1L)
-            map(reduced, function(pair) { pair[[2]] })
+            SparkR:::map(reduced, function(pair) { pair[[2]] })
           })
 
 #' Counts elements incrementally in DStream over a sliding window.
@@ -888,7 +888,7 @@ setMethod("reduceByWindow",
 setMethod("countByWindow",
           signature(x = "DStream"),
           function(x, windowDuration, slideDuration = NULL) {
-            reduceByWindow(map(x, function(e) { 1L }), "+", "-", 
+            reduceByWindow(SparkR:::map(x, function(e) { 1L }), "+", "-", 
                            windowDuration, slideDuration)
           })
 
@@ -909,10 +909,10 @@ setMethod("countByWindow",
 setMethod("countByValueAndWindow",
           signature(x = "DStream"),
           function(x, windowDuration, slideDuration = NULL, numPartitions = 1L) {
-            counted <- reduceByKeyAndWindow(map(x, function(k) { list(k, 1L) }), 
+            counted <- reduceByKeyAndWindow(SparkR:::map(x, function(k) { list(k, 1L) }), 
                                             "+", "-", windowDuration, slideDuration, 
                                             numPartitions)
-            count(filterRDD(counted, function(pair) { pair[[2]] > 0} ))
+            count(SparkR:::filterRDD(counted, function(pair) { pair[[2]] > 0} ))
           })
 
 #' Counts distinct elements incrementally in DStream over a sliding window.
@@ -932,7 +932,7 @@ setMethod("countByValueAndWindow",
 setMethod("groupByKeyAndWindow",
           signature(x = "DStream"),
           function(x, windowDuration, slideDuration = NULL, numPartitions = 1L) {
-            listed <- mapValues(x, function(v) { list(v) })
+            listed <- SparkR:::mapValues(x, function(v) { list(v) })
             counted <- reduceByKeyAndWindow(
               listed, c, function(prev, old) {
                 tail(prev, n = (length(prev) - length(old)))
@@ -964,17 +964,17 @@ setMethod("reduceByKeyAndWindow",
           function(x, reduceFunc, invReduceFunc = NULL, windowDuration, 
                    slideDuration = NULL, numPartitions = 1L, filterFunc = NULL) {
             validateWindowTime(x, windowDuration, slideDuration)
-            reduced <- reduceByKey(x, reduceFunc, numPartitions)
+            reduced <- SparkR:::reduceByKey(x, reduceFunc, numPartitions)
             func <- function(time, substractedRDD, newRDD) {
-              reducedNewRDD <- reduceByKey(newRDD, reduceFunc, numPartitions)
+              reducedNewRDD <- SparkR:::reduceByKey(newRDD, reduceFunc, numPartitions)
               if (!is.null(substractedRDD)) {
-                res <- reduceByKey(unionRDD(substractedRDD, reducedNewRDD), 
+                res <- SparkR:::reduceByKey(SparkR:::unionRDD(substractedRDD, reducedNewRDD), 
                                    reduceFunc, numPartitions)
               } else {
                 res <- reducedNewRDD
               }
               if (!is.null(filterFunc)) {
-                res <- filterRDD(res, filterFunc)
+                res <- SparkR:::filterRDD(res, filterFunc)
               }
               res
             }
@@ -999,8 +999,8 @@ setMethod("reduceByKeyAndWindow",
             } else {
               invReduceFunc <- match.fun(invReduceFunc)
               invFunc <- function(time, previousRDD, oldRDD) {
-                reducedOldRDD <- reduceByKey(oldRDD, reduceFunc, numPartitions)
-                joined <- leftOuterJoin(previousRDD, reducedOldRDD, numPartitions)
+                reducedOldRDD <- SparkR:::reduceByKey(oldRDD, reduceFunc, numPartitions)
+                joined <- SparkR:::leftOuterJoin(previousRDD, reducedOldRDD, numPartitions)
                 mapValues(joined, function(value) {
                   if (is.null(value[[2]])) {
                     value[[1]]
@@ -1045,11 +1045,11 @@ setMethod("updateStateByKey",
           function(x, updateFunc, numPartitions = 1L) {
             reduceFunc <- function(time, stateRDD, newRDD) {
               g <- if (is.null(stateRDD)) {
-                mapValues(groupByKey(newRDD, numPartitions), function(vList) {
+                SparkR:::mapValues(SparkR:::groupByKey(newRDD, numPartitions), function(vList) {
                   list(vList, NULL)
                 })
               } else {
-                mapValues(cogroup(stateRDD, newRDD, numPartitions = numPartitions), 
+                SparkR:::mapValues(cogroup(stateRDD, newRDD, numPartitions = numPartitions), 
                           function(vPair) {
                             if (length(vPair[[1]] > 0)) {
                               list(vPair[[2]], vPair[[1]][[1]])
@@ -1058,10 +1058,10 @@ setMethod("updateStateByKey",
                             }
                           })
               }
-              state <- mapValues(g, function(vPair) {
+              state <- SparkR:::mapValues(g, function(vPair) {
                 updateFunc(vPair[[1]], vPair[[2]])
               })
-              filterRDD(state, function(s) { !is.null(s[[2]]) })
+              SparkR:::filterRDD(state, function(s) { !is.null(s[[2]]) })
             }
             dstreamRef <- newJObject("org.apache.spark.streaming.api.r.RStateDStream",
                                      callJMethod(getJDStream(x), "dstream"),
