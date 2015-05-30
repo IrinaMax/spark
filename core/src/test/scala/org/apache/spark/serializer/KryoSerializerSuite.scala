@@ -23,14 +23,13 @@ import scala.collection.mutable
 import scala.reflect.ClassTag
 
 import com.esotericsoftware.kryo.Kryo
-import org.scalatest.FunSuite
 
-import org.apache.spark.{SharedSparkContext, SparkConf}
+import org.apache.spark.{SharedSparkContext, SparkConf, SparkFunSuite}
 import org.apache.spark.scheduler.HighlyCompressedMapStatus
 import org.apache.spark.serializer.KryoTest._
 import org.apache.spark.storage.BlockManagerId
 
-class KryoSerializerSuite extends FunSuite with SharedSparkContext {
+class KryoSerializerSuite extends SparkFunSuite with SharedSparkContext {
   conf.set("spark.serializer", "org.apache.spark.serializer.KryoSerializer")
   conf.set("spark.kryo.registrator", classOf[MyRegistrator].getName)
 
@@ -109,7 +108,7 @@ class KryoSerializerSuite extends FunSuite with SharedSparkContext {
     check((1, 1))
     check((1, 1L))
     check((1L, 1))
-    check((1L,  1L))
+    check((1L, 1L))
     check((1.0, 1))
     check((1, 1.0))
     check((1.0, 1.0))
@@ -147,7 +146,7 @@ class KryoSerializerSuite extends FunSuite with SharedSparkContext {
     check(List(Some(mutable.HashMap(1->1, 2->2)), None, Some(mutable.HashMap(3->4))))
     check(List(
       mutable.HashMap("one" -> 1, "two" -> 2),
-      mutable.HashMap(1->"one",2->"two",3->"three")))
+      mutable.HashMap(1->"one", 2->"two", 3->"three")))
   }
 
   test("ranges") {
@@ -361,7 +360,7 @@ class KryoSerializerSuite extends FunSuite with SharedSparkContext {
   }
 }
 
-class KryoSerializerAutoResetDisabledSuite extends FunSuite with SharedSparkContext {
+class KryoSerializerAutoResetDisabledSuite extends SparkFunSuite with SharedSparkContext {
   conf.set("spark.serializer", classOf[KryoSerializer].getName)
   conf.set("spark.kryo.registrator", classOf[RegistratorWithoutAutoReset].getName)
   conf.set("spark.kryo.referenceTracking", "true")
